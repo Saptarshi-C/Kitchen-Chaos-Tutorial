@@ -666,6 +666,8 @@ MonoBehaviour:
   moveSpeed: 7
   rotateSpeed: 10
   gameInput: {fileID: 1151701859}
+  playerRadius: 0.7
+  playerHeight: 2
 --- !u!4 &962638077
 Transform:
   m_ObjectHideFlags: 0
