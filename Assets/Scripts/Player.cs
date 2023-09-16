@@ -16,6 +16,38 @@ public class Player : MonoBehaviour
     private Vector3 lastInteractDir;
 
     /// <summary>
+    /// Start is called before first frame
+    /// </summary>
+    private void Start()
+    {
+        gameInput.OnInteractAction += GameInput_OnInteractAction;
+    }
+
+    private void GameInput_OnInteractAction(object sender, System.EventArgs e)
+    {
+        // Get input vector and convert it to a Vector3
+        Vector2 inputVector = gameInput.GetMovementVectorNormalized();
+        Vector3 moveDir = new Vector3(inputVector.x, 0f, inputVector.y);
+
+        // Set the last interact direction as long as the movedir is set
+        if (moveDir != Vector3.zero)
+        {
+            lastInteractDir = moveDir;
+        }
+
+        // Fire a ray towards last interact direction to determine if it hit something in a particular layer.
+        // If it hits something return the hit information as a RaycastHit object.
+        if (Physics.Raycast(transform.position, lastInteractDir, out RaycastHit raycastHit, interactDistance, countersLayerMask))
+        {
+            // Try to get the ClearCounter component from the object
+            if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
+            {
+                clearCounter.Interact();
+            }
+        }
+    }
+
+    /// <summary>
     /// Called every frame
     /// </summary>
     private void Update()
@@ -114,12 +146,8 @@ public class Player : MonoBehaviour
             // Try to get the ClearCounter component from the object
             if(raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
             {
-                clearCounter.Interact();
+                //clearCounter.Interact();
             }
-        }
-        else
-        {
-            // No Interaction
         }
     }
 }
