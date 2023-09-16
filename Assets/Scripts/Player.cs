@@ -4,18 +4,42 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] float moveSpeed = 7f;
-    [SerializeField] float rotateSpeed = 10f;
-    [SerializeField] GameInput gameInput;
-    [SerializeField] float playerRadius = 0.7f;
-    [SerializeField] float playerHeight = 2f;
+    [SerializeField] private float moveSpeed = 7f;
+    [SerializeField] private float rotateSpeed = 10f;
+    [SerializeField] private GameInput gameInput;
+    [SerializeField] private float playerRadius = 0.7f;
+    [SerializeField] private float playerHeight = 2f;
+    [SerializeField] private float interactDistance = 2f;
+    [SerializeField] private LayerMask countersLayerMask;
 
     private bool isWalking = false;
+    private Vector3 lastInteractDir;
 
     /// <summary>
     /// Called every frame
     /// </summary>
     private void Update()
+    {
+        HandleMovement();
+        HandleInteractions();
+    }
+
+    /// <summary>
+    /// Used to return if the player is walking to other classes
+    /// </summary>
+    /// <returns>True if the player is walking</returns>
+    public bool IsWalking()
+    {
+        return isWalking;
+    }
+
+    /// <summary>
+    /// Gets a normalized input vector
+    /// Checks for blocking objects
+    /// Splits movement into component if blocking objects are present and player is moving
+    /// Rotates player towards move direction
+    /// </summary>
+    private void HandleMovement()
     {
         // Get input vector and convert it to a Vector3
         Vector2 inputVector = gameInput.GetMovementVectorNormalized();
@@ -28,15 +52,15 @@ public class Player : MonoBehaviour
 
         // Find if there is anything blocking the path
         bool canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDir, moveDistance);
-        
+
         // If player cannot move in move direction, check for individual components
-        if(!canMove)
+        if (!canMove)
         {
             // Check if X direction is blocked
             Vector3 moveDirX = new Vector3(moveDir.x, 0, 0).normalized;
             canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirX, moveDistance);
-            
-            if(canMove)
+
+            if (canMove)
             {
                 moveDir = moveDirX;
             }
@@ -46,7 +70,7 @@ public class Player : MonoBehaviour
                 Vector3 moveDirZ = new Vector3(0, 0, moveDir.z).normalized;
                 canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirZ, moveDistance);
 
-                if(canMove)
+                if (canMove)
                 {
                     moveDir = moveDirZ;
                 }
@@ -69,11 +93,33 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
-    /// Used to return if the player is walking to other classes
+    /// Use raycast to determine if player hit object.
     /// </summary>
-    /// <returns>True if the player is walking</returns>
-    public bool IsWalking()
+    private void HandleInteractions()
     {
-        return isWalking;
+        // Get input vector and convert it to a Vector3
+        Vector2 inputVector = gameInput.GetMovementVectorNormalized();
+        Vector3 moveDir = new Vector3(inputVector.x, 0f, inputVector.y);
+
+        // Set the last interact direction as long as the movedir is set
+        if(moveDir != Vector3.zero)
+        {
+            lastInteractDir = moveDir;
+        }
+
+        // Fire a ray towards last interact direction to determine if it hit something in a particular layer.
+        // If it hits something return the hit information as a RaycastHit object.
+        if(Physics.Raycast(transform.position, lastInteractDir, out RaycastHit raycastHit, interactDistance, countersLayerMask))
+        {
+            // Try to get the ClearCounter component from the object
+            if(raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
+            {
+                clearCounter.Interact();
+            }
+        }
+        else
+        {
+            // No Interaction
+        }
     }
 }
