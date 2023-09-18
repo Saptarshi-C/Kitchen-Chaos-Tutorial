@@ -31,6 +31,7 @@ public class Player : MonoBehaviour
     /// </summary>
     private void Awake()
     {
+        // Set singleton
         if(Instance != null)
         {
             Destroy(Instance);
@@ -172,6 +173,11 @@ public class Player : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Sets selectedcounter to the selected object
+    /// Invokes the event for selected counter changed event
+    /// </summary>
+    /// <param name="selectedCounter">The selected object</param>
     private void SetSelectedCounter(ClearCounter selectedCounter)
     {
         this.selectedCounter = selectedCounter;
