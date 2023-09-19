@@ -6,7 +6,7 @@ public class KitchenObject : MonoBehaviour
 {
     [SerializeField] private KitchenObjectSO kitchenObjectSO;
 
-    private ClearCounter clearCounter;
+    private IKitchenObjectParent kitchenObjectParent;
 
     /// <summary>
     /// Returns the KitchenObjectSO attached to the object
@@ -20,24 +20,24 @@ public class KitchenObject : MonoBehaviour
     /// <summary>
     /// Move object to new counter
     /// </summary>
-    /// <param name="clearCounter">The new counter to move object to</param>
-    public void SetClearCounter(ClearCounter clearCounter)
+    /// <param name="kitchenObjectParent">The new counter to move object to</param>
+    public void SetKitchenObjectParent(IKitchenObjectParent kitchenObjectParent)
     {
-        if(this.clearCounter !=null)
+        if(this.kitchenObjectParent !=null)
         {
-            this.clearCounter.ClearKitchenObject();
+            this.kitchenObjectParent.ClearKitchenObject();
         }
 
-        this.clearCounter = clearCounter;
+        this.kitchenObjectParent = kitchenObjectParent;
 
-        if(clearCounter.HasKitchenObject())
+        if(kitchenObjectParent.HasKitchenObject())
         {
-            Debug.LogError("Counter is full");
+            Debug.LogError("IKitchenObjectParent is full");
         }
 
-        clearCounter.SetKitchenObject(this);
+        kitchenObjectParent.SetKitchenObject(this);
 
-        transform.parent = clearCounter.GetKitchenObjectFollowTransform();
+        transform.parent = kitchenObjectParent.GetKitchenObjectFollowTransform();
         transform.localPosition = Vector3.zero;
     }
 
@@ -45,8 +45,8 @@ public class KitchenObject : MonoBehaviour
     /// Get the clear counter the object is on
     /// </summary>
     /// <returns>The counter the object is on</returns>
-    public ClearCounter GetClearCounter()
+    public IKitchenObjectParent GetKitchenObjectParent()
     {
-        return clearCounter;
+        return kitchenObjectParent;
     }
 }

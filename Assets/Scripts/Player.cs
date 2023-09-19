@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IKitchenObjectParent
 {
     // Singleton 
     public static Player Instance { get; private set; }
@@ -22,9 +22,13 @@ public class Player : MonoBehaviour
     [SerializeField] private float interactDistance = 2f;
     [SerializeField] private LayerMask countersLayerMask;
 
+    [SerializeField] private Transform KitchenObjectHoldPoint;
+
     private bool isWalking = false;
     private Vector3 lastInteractDir;
     private ClearCounter selectedCounter;
+
+    private KitchenObject kitchenObject;
 
     /// <summary>
     /// Awake is called before start
@@ -54,7 +58,7 @@ public class Player : MonoBehaviour
     {
         if(selectedCounter != null)
         {
-            selectedCounter.Interact();
+            selectedCounter.Interact(this);
         }
     }
 
@@ -186,5 +190,49 @@ public class Player : MonoBehaviour
         {
             selectedCounter = selectedCounter
         });
+    }
+
+    /// <summary>
+    /// Get the clear counter counter top point
+    /// </summary>
+    /// <returns>Counter Top Point</returns>
+    public Transform GetKitchenObjectFollowTransform()
+    {
+        return KitchenObjectHoldPoint;
+    }
+
+    /// <summary>
+    /// Sets the kitchen object on the counter
+    /// </summary>
+    /// <param name="kitchenObject">Kitchen object to be set</param>
+    public void SetKitchenObject(KitchenObject kitchenObject)
+    {
+        this.kitchenObject = kitchenObject;
+    }
+
+    /// <summary>
+    /// Gets the kitchen object on the counter
+    /// </summary>
+    /// <returns>Kitchen object on the counter</returns>
+    public KitchenObject GetKitchenObject()
+    {
+        return kitchenObject;
+    }
+
+    /// <summary>
+    /// Removes kitchen object from counter
+    /// </summary>
+    public void ClearKitchenObject()
+    {
+        kitchenObject = null;
+    }
+
+    /// <summary>
+    /// Check if counter is occupied by kitchen object
+    /// </summary>
+    /// <returns>True if kitchen object is present</returns>
+    public bool HasKitchenObject()
+    {
+        return (kitchenObject != null);
     }
 }
