@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class SelectedCounterVisual : MonoBehaviour
 {
-    [SerializeField] private ClearCounter clearCounter;
-    [SerializeField] private GameObject selectedCounterVisual;
+    [SerializeField] private BaseCounter baseCounter;
+    [SerializeField] private GameObject[] selectedCounterVisualArray;
 
     /// <summary>
     /// Start is called before the first frame
@@ -17,13 +17,19 @@ public class SelectedCounterVisual : MonoBehaviour
 
     private void Player_OnSelectedCounterChanged(object sender, Player.OnSelectedCounterChangedEventArgs e)
     {
-        if(e.selectedCounter == clearCounter)
+        if(e.selectedCounter == baseCounter)
         {
-            selectedCounterVisual.SetActive(true);
+            foreach (GameObject selectedCounterVisual in selectedCounterVisualArray)
+            {
+                selectedCounterVisual.SetActive(true);
+            }
         }
         else
         {
-            selectedCounterVisual.SetActive(false);
+            foreach (GameObject selectedCounterVisual in selectedCounterVisualArray)
+            {
+                selectedCounterVisual.SetActive(false);
+            }
         }
     }
 }
